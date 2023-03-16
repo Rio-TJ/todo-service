@@ -1,0 +1,70 @@
+basePath: /
+definitions:
+  models.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  models.Task:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      text:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - text
+    type: object
+host: localhost:4000
+info:
+  contact:
+    email: info@softclub.tj
+    name: SoftClub
+    url: https://www.softclub.tj/Contacts
+  description: This is a sample Todo Application API
+  title: Todo Service API
+  version: 0.0.0
+paths:
+  /tasks:
+    get:
+      description: Get the list of all the tasks
+      parameters:
+      - description: 'Pagination parameter: page number'
+        in: path
+        name: page
+        type: integer
+      - description: 'Pagination parameter: number of elements on a page'
+        in: path
+        name: per_page
+        type: integer
+      - description: Filtering by status (done|undone)
+        in: path
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Get all the tasks
+      tags:
+      - tasks
+swagger: "2.0"

@@ -15,6 +15,18 @@ import (
 	"strings"
 )
 
+// GetTasks godoc
+//
+//	@Summary		Get all the tasks
+//	@Description	Get the list of all the tasks
+//	@Tags			tasks
+//	@Produce		json
+//	@Param			page		path		int		false	"Pagination parameter: page number"
+//	@Param			per_page	path		int		false	"Pagination parameter: number of elements on a page"
+//	@Param			status		path		string	true	"Filtering by status (done|undone)"	extension(x-nullable,x-abc=def)
+//	@Success		200			{array}		models.Task
+//	@Failure		500			{object}	models.HTTPError
+//	@Router			/tasks [get]
 func (h *Handler) GetTasks(c *gin.Context) {
 	var tasks []models.Task
 	queryParams := c.Request.URL.Query()

@@ -3,12 +3,26 @@ package main
 import (
 	"flag"
 	"fmt"
+	_ "github.com/SoftclubIT/todo-service/docs"
 	"github.com/SoftclubIT/todo-service/pkg/database"
 	"github.com/SoftclubIT/todo-service/pkg/handlers"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 )
 
+//	@title			Todo Service API
+//	@version		0.0.0
+//	@description	This is a sample Todo Application API
+
+//	@contact.name	SoftClub
+//	@contact.url	https://www.softclub.tj/Contacts
+//	@contact.email	info@softclub.tj
+
+//	@host						localhost:4000
+//	@BasePath					/
+//	@query.collection.format	multi
 func main() {
 	fmt.Println("Todo Service API v0.0")
 
@@ -40,6 +54,7 @@ func main() {
 		tasks.POST("/:taskID/completed", hndlrs.CompleteTask)
 		tasks.DELETE("/:taskID/completed", hndlrs.UndoTask)
 	}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run(":" + *listenPort)
 }
