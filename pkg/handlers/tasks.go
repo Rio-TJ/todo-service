@@ -111,3 +111,53 @@ func (h *Handler) DeleteTask(c *gin.Context) {
 		"message": "Successfully deleted task",
 	})
 }
+
+func (h *Handler) CompleteTask(c *gin.Context) {
+	taskID := c.Param("taskID")
+
+	var task models.Task
+
+	result := h.DB.First(&task, taskID)
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Record not found",
+		})
+		return
+	}
+
+	task.Status = "done"
+
+	if result = h.DB.Save(&task); result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Internal server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, task)
+}
+
+func (h *Handler) UndoTask(c *gin.Context) {
+	taskID := c.Param("taskID")
+
+	var task models.Task
+
+	result := h.DB.First(&task, taskID)
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Record not found",
+		})
+		return
+	}
+
+	task.Status = "undone"
+
+	if result = h.DB.Save(&task); result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Internal server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, task)
+}
