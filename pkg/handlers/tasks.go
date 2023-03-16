@@ -91,3 +91,23 @@ func (h *Handler) CreateTask(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, task)
 }
+
+func (h *Handler) DeleteTask(c *gin.Context) {
+	taskID := c.Param("taskID")
+
+	var task models.Task
+
+	result := h.DB.First(&task, taskID)
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Record not found",
+		})
+		return
+	}
+
+	h.DB.Delete(&task)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully deleted task",
+	})
+}

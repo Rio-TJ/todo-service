@@ -3,7 +3,7 @@ package helpers
 func ValidationMessageForTag(tag, param string) string {
 	switch tag {
 	case "required":
-		return "Это поле обязательно к заполнению"
+		return "This field is required"
 	default:
 		return ""
 	}

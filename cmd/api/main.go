@@ -36,7 +36,7 @@ func main() {
 	{
 		tasks.GET("", hndlrs.GetTasks)
 		tasks.POST("", hndlrs.CreateTask)
-		//tasks.DELETE("/:taskID", hndlrs.DeleteTask)
+		tasks.DELETE("/:taskID", hndlrs.DeleteTask)
 		//tasks.POST("/:taskID/completed", hndlrs.CompleteTask)
 		//tasks.DELETE("/:taskID/completed", hndlrs.UndoTask)
 	}
