@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/SoftclubIT/todo-service/pkg/database"
+	"github.com/SoftclubIT/todo-service/pkg/handlers"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"log"
 )
 
 func main() {
@@ -16,16 +18,28 @@ func main() {
 	dbPassword := flag.String("dbpassword", "developer", "PostgreSQL user password")
 	dbName := flag.String("dbname", "todo_service", "PostgreSQL database name")
 	dbPort := flag.String("dbport", "5432", "PostgreSQL database port")
-	frontendAppDomain := flag.String("frontendappdomain", "http://localhost:3000", "The domain of frontend application for allowing CORS requests")
+	//frontendAppDomain := flag.String("frontendappdomain", "http://localhost:3000", "The domain of frontend application for allowing CORS requests")
 
 	flag.Parse()
 
-	db, err :=
+	db, err := database.Init(*dbHost, *dbUser, *dbPassword, *dbName, *dbPort)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	router.Run()
+	hndlrs := handlers.New(db)
+
+	router.GET("/health-check", hndlrs.HealthCheck)
+
+	tasks := router.Group("tasks")
+	{
+		tasks.GET("", hndlrs.GetTasks)
+		tasks.POST("", hndlrs.CreateTask)
+		tasks.DELETE("/:taskID", hndlrs.DeleteTask)
+		tasks.POST("/:taskID/completed", hndlrs.CompleteTask)
+		tasks.DELETE("/:taskID/completed", hndlrs.UndoTask)
+	}
+
+	router.Run(":" + *listenPort)
 }
