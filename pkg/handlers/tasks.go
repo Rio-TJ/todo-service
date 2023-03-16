@@ -19,7 +19,9 @@ func (h *Handler) GetTasks(c *gin.Context) {
 	var tasks []models.Task
 	queryParams := c.Request.URL.Query()
 
-	result := h.DB.Scopes(scopes.Paginate(queryParams)).Find(&tasks)
+	result := h.DB.
+		Scopes(scopes.Paginate(queryParams), scopes.Filter(queryParams)).
+		Find(&tasks)
 	if result.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal server error",

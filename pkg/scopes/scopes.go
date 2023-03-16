@@ -25,3 +25,13 @@ func Paginate(q url.Values) func(db *gorm.DB) *gorm.DB {
 		return db.Offset(offset).Limit(perPage)
 	}
 }
+
+func Filter(q url.Values) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		status := q.Get("status")
+		if status == "done" || status == "undone" {
+			db.Where("status", status)
+		}
+		return db
+	}
+}

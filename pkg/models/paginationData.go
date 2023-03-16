@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/SoftclubIT/todo-service/pkg/scopes"
 	"gorm.io/gorm"
 	"net/url"
 	"strconv"
@@ -18,7 +19,7 @@ type PaginationData struct {
 func NewPaginationData(DB *gorm.DB, model interface{}, params url.Values) (*PaginationData, error) {
 	pd := &PaginationData{}
 
-	result := DB.Model(model).Count(&pd.TotalElements)
+	result := DB.Model(model).Scopes(scopes.Filter(params)).Count(&pd.TotalElements)
 	if result.Error != nil {
 		return nil, result.Error
 	}
