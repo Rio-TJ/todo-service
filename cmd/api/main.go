@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/SoftclubIT/todo-service/docs"
 	_ "github.com/SoftclubIT/todo-service/docs"
 	"github.com/SoftclubIT/todo-service/pkg/database"
 	"github.com/SoftclubIT/todo-service/pkg/handlers"
+	"github.com/SoftclubIT/todo-service/pkg/middlewares"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -20,13 +22,14 @@ import (
 //	@contact.url	https://www.softclub.tj/Contacts
 //	@contact.email	info@softclub.tj
 
-//	@host						localhost:4000
-//	@BasePath					/
-//	@query.collection.format	multi
+// @host						localhost:4000
+// @BasePath					/
+// @query.collection.format	multi
 func main() {
 	fmt.Println("Todo Service API v0.0")
 
-	listenPort := flag.String("listenport", "4000", "Which port to listen")
+	host := flag.String("host", "http://localhost", "The server address")
+	port := flag.String("listenport", "4000", "Which port to listen")
 	dbHost := flag.String("dbhost", "localhost", "PostgreSQL hostname")
 	dbUser := flag.String("dbuser", "developer", "PostgreSQL user name")
 	dbPassword := flag.String("dbpassword", "developer", "PostgreSQL user password")
@@ -36,12 +39,16 @@ func main() {
 
 	flag.Parse()
 
+	docs.SwaggerInfo.Host = *host
+	docs.SwaggerInfo.Schemes = []string{"http"}
+
 	db, err := database.Init(*dbHost, *dbUser, *dbPassword, *dbName, *dbPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	router := gin.Default()
+	router.Use(middlewares.CORSMiddleware(""))
 	hndlrs := handlers.New(db)
 
 	router.GET("/health-check", hndlrs.HealthCheck)
@@ -56,5 +63,5 @@ func main() {
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	router.Run(":" + *listenPort)
+	router.Run(":" + *port)
 }
