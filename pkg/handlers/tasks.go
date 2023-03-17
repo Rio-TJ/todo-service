@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -21,9 +20,9 @@ import (
 //	@Description	Get the list of all the tasks
 //	@Tags			tasks
 //	@Produce		json
-//	@Param			page		path		int		false	"Pagination parameter: page number"
-//	@Param			per_page	path		int		false	"Pagination parameter: number of elements on a page"
-//	@Param			status		path		string	true	"Filtering by status (done|undone)"	extension(x-nullable,x-abc=def)
+//	@Param			page		query		int		false	"Pagination parameter: page number"
+//	@Param			per_page	query		int		false	"Pagination parameter: number of elements on a page"
+//	@Param			status		query		string	false	"Filtering by status (done|undone)"
 //	@Success		200			{array}		models.Task
 //	@Failure		500			{object}	models.HTTPError
 //	@Router			/tasks [get]
@@ -55,6 +54,19 @@ func (h *Handler) GetTasks(c *gin.Context) {
 	})
 }
 
+// CreateTask godoc
+//
+//	@Summary		Create a task
+//	@Description	Create a task
+//	@Tags			tasks
+//	@Accept			json
+//	@Produce		json
+//	@Param			text	body		string	true	"The text of the task"
+//	@Success		200		{object}	models.Task
+//	@Failure		400		{object}	models.HTTPError
+//	@Failure		422		{object}	models.HTTPError
+//	@Failure		500		{object}	models.HTTPError
+//	@Router			/tasks [post]
 func (h *Handler) CreateTask(c *gin.Context) {
 	var task models.Task
 
@@ -79,9 +91,9 @@ func (h *Handler) CreateTask(c *gin.Context) {
 					validationErrors[valError.Field()] = helpers.ValidationMessageForTag(valError.Tag(), valError.Param())
 				}
 			}
-		} else if err == io.EOF {
+		} else {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"message": "Empty body",
+				"message": "Bad Request",
 			})
 			return
 		}
@@ -106,6 +118,17 @@ func (h *Handler) CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, task)
 }
 
+// DeleteTask godoc
+//
+//	@Summary		Delete a task
+//	@Description	Delete a task
+//	@Tags			tasks
+//	@Produce		json
+//	@Param			taskID	path		int	true	"The ID of the task that should be deleted"
+//	@Success		200		{string}	"Successfully deleted the task"
+//	@Failure		404		{object}	models.HTTPError
+//	@Failure		500		{object}	models.HTTPError
+//	@Router			/tasks/{taskID} [delete]
 func (h *Handler) DeleteTask(c *gin.Context) {
 	taskID := c.Param("taskID")
 
@@ -126,6 +149,17 @@ func (h *Handler) DeleteTask(c *gin.Context) {
 	})
 }
 
+// CompleteTask godoc
+//
+//	@Summary		Complete a task
+//	@Description	Change status of a task to done
+//	@Tags			tasks
+//	@Produce		json
+//	@Param			taskID	path		int	true	"The ID of the task which status should be changed to done"
+//	@Success		200		{object}	models.Task
+//	@Failure		404		{object}	models.HTTPError
+//	@Failure		500		{object}	models.HTTPError
+//	@Router			/tasks/{taskID}/completed [post]
 func (h *Handler) CompleteTask(c *gin.Context) {
 	taskID := c.Param("taskID")
 
@@ -151,6 +185,17 @@ func (h *Handler) CompleteTask(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
+// UndoTask godoc
+//
+//	@Summary		Undo a task
+//	@Description	Change status of a task to undone
+//	@Tags			tasks
+//	@Produce		json
+//	@Param			taskID	path		int	true	"The ID of the task which status should be changed to undone"
+//	@Success		200		{object}	models.Task
+//	@Failure		404		{object}	models.HTTPError
+//	@Failure		500		{object}	models.HTTPError
+//	@Router			/tasks/{taskID}/completed [delete]
 func (h *Handler) UndoTask(c *gin.Context) {
 	taskID := c.Param("taskID")
 

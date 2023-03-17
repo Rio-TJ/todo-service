@@ -39,17 +39,16 @@ paths:
       description: Get the list of all the tasks
       parameters:
       - description: 'Pagination parameter: page number'
-        in: path
+        in: query
         name: page
         type: integer
       - description: 'Pagination parameter: number of elements on a page'
-        in: path
+        in: query
         name: per_page
         type: integer
       - description: Filtering by status (done|undone)
-        in: path
+        in: query
         name: status
-        required: true
         type: string
       produces:
       - application/json
@@ -65,6 +64,119 @@ paths:
           schema:
             $ref: '#/definitions/models.HTTPError'
       summary: Get all the tasks
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: Create a task
+      parameters:
+      - description: The text of the task
+        in: body
+        name: text
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Create a task
+      tags:
+      - tasks
+  /tasks/{taskID}:
+    delete:
+      description: Delete a task
+      parameters:
+      - description: The ID of the task that should be deleted
+        in: path
+        name: taskID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted the task
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Delete a task
+      tags:
+      - tasks
+  /tasks/{taskID}/completed:
+    delete:
+      description: Change status of a task to undone
+      parameters:
+      - description: The ID of the task which status should be changed to undone
+        in: path
+        name: taskID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Undo a task
+      tags:
+      - tasks
+    post:
+      description: Change status of a task to done
+      parameters:
+      - description: The ID of the task which status should be changed to done
+        in: path
+        name: taskID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.HTTPError'
+      summary: Complete a task
       tags:
       - tasks
 swagger: "2.0"
